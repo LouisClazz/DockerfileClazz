@@ -81,7 +81,8 @@ docker build -t dockerclazz-frontend:v0.1 -f frontend/Dockerfile frontend
 
 #### 🐳 1.3 Creating a container from our image and testing.
 
-Now you could run the image with [docker run](https://docs.docker.com/engine/reference/commandline/run/). You can use this option:
+Now that you successfully built your image, you can spawn a container from this image and test it, using [docker run](https://docs.docker.com/engine/reference/commandline/run/). 
+Here's a list of usefull options :
 
 - interactive
 - tty
@@ -125,22 +126,27 @@ If you now build your image again, the image should be much more of a lighter we
 
 ### 🐍 2. Create Dockerfile for Django
 
-Now you could create a file named `Dockerfile` in the directory `./backend`.
-Frontend app is a Django app, to build a Django app you will need to:
+In this second part we'll be writing a new `Dockerfile`for a backend app in the `./backend` directory.
+The objective here is the same but with less help.
+
+#### 🐍 2.1 Writing the Dockerfile.
+
+As the backend app is a Django app, to build the image you need to :
 
 - Use a base image named `python:3`
 - Create a workspace directory named `/app`
 - Copy `requirements.txt`
-- Run `$ pip install -r requirements.txt` to install dependancies
+- Run `$ pip install -r requirements.txt` to install dependencies
 - Copy the whole content in brackend directory into the docker image
 - Add an environement variable named `PORT` with default value `9090`
 - Then execute the commande `sh -c "/app/manage.py runserver 0.0.0.0:$PORT"` to run the web server at startup, `sh -c` allow you to add environement variable in commande
 
->I created for you a file named `.dockerignore` who allow, like gitignore, to omit or no, copy of file or directory into an image. You should notice tha we have use a white-list system, allow only what you need.
+#### 🐍 2.2 Building the docker image.
 
-Now you could build the image with [docker build](https://docs.docker.com/engine/reference/commandline/build/) from the root of this project. You can use this option:
+Now that you wrote your dockerfile, you can build the image using [docker build](https://docs.docker.com/engine/reference/commandline/build/) from the root of this project.
+Here's a list of usefull options :
 
-- Named or tagged the image
+- Name or tag the image
 - Specify a Dockerfile
 - Specify the path of the build
 
@@ -151,7 +157,10 @@ docker build -t dockerclazz-backend:v0.1 -f backend/Dockerfile backend
 ```
 </details>
 
-Now you could run the image with [docker run](https://docs.docker.com/engine/reference/commandline/run/). You can use this option:
+#### 🐍 2.3 Creating a container from our image and testing.
+
+Now that you successfully built your image, you can spawn a container from this image and test it, using [docker run](https://docs.docker.com/engine/reference/commandline/run/). 
+Here's a list of usefull options :
 
 - interactive
 - tty
@@ -170,7 +179,7 @@ docker run -it -d -e PORT=9091 -p 9090:9091 --rm --name dockerize-django dockerc
 
 Then you can visit this url: http://localhost:9090/api/
 
-If you finished execute :
+If you finished the execution :
 ```bash
 docker ps -a
 docker stop <CONTAINER_NAME_OR_ID>
