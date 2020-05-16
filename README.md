@@ -8,46 +8,52 @@
   </a>
 </p>
 
-> This project aims to help you to write good Dockerfile
+> This project aims to introduce you into writing clean Dockerfiles to lightweight your Docker images.
 
 ## General presentation
 
-The goal of this project is to help you to follow my advises to write Dockerfile and possibly some good ones. You will follow step by step a sequence of questions who refer to official documentation and you will build docker image at the end. 🚀
+The goal of this project is to help you to follow my advises to write Dockerfile and introduce you to Docker best practises. You will follow a sequence of steps which will guide you throught the journey of building Dockerfiles. You will also need to refer to the official [Docker documentation](https://docs.docker.com/).
 
 ## Description of the project structure
 
 In this project you will find:
-* A frontend application VueJS in the directory `./frontend`
-* A backend application Django in the directory `./backend`
-* And this README
+* A frontend application VueJS in the directory `./frontend`.
+* A backend application Django in the directory `./backend`.
+* And this README.
 
-I invite you to fork this project for working on it
+I invite you to fork this project to work directly on it.
 
 ## Requierements to start this project
 
-First of all you will need to install [Docker 🐳](https://docs.docker.com/get-docker/) (If install on your laptop is boring you could install it on virtual machine or a Cloud Provider just think you will need this project to code).
+First of all you will need to install [Docker 🐳](https://docs.docker.com/get-docker/) (If you don't want to install it on your laptop you could install it on a virtual machine or a Cloud Provider but remember you'll need this project on the machine hosting docker to build your docker images).
 
-Now you would need to clone this project to start to work.
+You also need to fork/clone this project to start working.
 
 ## 📚 Steps
 
-The VueJS and Django applications in the project are minimalist. The goal is not to dwell on the code of the applications but to focus on the following aspects :
+The VueJS and Django applications in the project are minimalist. As said previously, the goal is not to dwell on the code of the applications but to focus on the following aspects :
 
-- Understand docker image build
-- Use docker cli, Dockerfile
-- Use CI to build and store your image
+- Understanding docker image build
+- Use docker CLI, and write Dockerfiles
+- Use CI to build and store your docker image
 
-### 🐳 1. Create Dockerfile for VueJS
+### 🐳 1. Creating the Dockerfile for the VueJS app
 
-Now you could create a file named `Dockerfile` in the directory `./frontend`.
-Frontend app is a VueJS app, to build a VueJS app you will need to:
+Now that you filled all the requirements, you can start creating a file named `Dockerfile` in the directory `./frontend`.
 
-- Use a base image named `node:lts-slim`
-- Create a workspace directory named `/app`
-- Copy package.json and package-lock.json (here the doc of [package-lock.json](https://docs.npmjs.com/configuring-npm/package-lock-json.html) and [package.json](https://docs.npmjs.com/configuring-npm/package-json.html))
-- Run `$ npm ci` to install dependancies (here the doc for [npm-ci](https://docs.npmjs.com/cli/ci.html))
-- Copy the whole content in frontend directory into the docker image
-- Run `$ npm run build` to build the project (this command is defined into `package.json` file as `vue-cli-service build`, I let you checkout the documentation about [npm-run](https://docs.npmjs.com/cli/run-script) to understand the principe of npm scripts)
+#### 🐳 1.1 Writing the Dockerfile.
+
+This file is the file that will be used by docker to build the image which will then be used by docker to spawn 1 or more containers.
+As the frontend app is a VueJS app, to build the image you need to :
+
+- Use a base image named `node:lts-slim`.
+- Create a workspace directory named `/app`.
+- Copy package.json and package-lock.json (Check the official documentation of [package-lock.json](https://docs.npmjs.com/configuring-npm/package-lock-json.html) and [package.json](https://docs.npmjs.com/configuring-npm/package-json.html))
+- Run `$ npm ci` to install dependancies (Check the official documentation for [npm-ci](https://docs.npmjs.com/cli/ci.html))
+>__Note:__ We first copy the `package.json` and `package-lock.json` files into the image and download dependencies so docker keep these layers in its cache so we don't have to download it again everytime we build the image.
+- Copy the whole content of the frontend directory into the docker image.
+- Run `$ npm run build` to build the project as a static html/css/js app.
+>__Note:__ When using VueJS, this command is defined into `package.json` file as `vue-cli-service build`. As a result behind the scenes, this is the command that will be used to build the app. You can checkout the documentation about [npm-run](https://docs.npmjs.com/cli/run-script) to understand how of npm scripts works)
 
 To use a base image you should use annotation [FROM](https://docs.docker.com/engine/reference/builder/#from)
 
@@ -57,18 +63,12 @@ To copy a file from the project into the image you should use annotation [ADD](h
 
 To run a command into docker image you should use annotation [RUN](https://docs.docker.com/engine/reference/builder/#run)
 
-Now you have an image with all copied files before. But you will just need the content of the static build directory named `dist` into `/app` who resulting of the command `$ npm run build`.
+#### 🐳 1.2 Building the docker image.
 
-To keep the only important content `/app/dist` you should do a [multi stage](https://docs.docker.com/develop/develop-images/multistage-build/#name-your-build-stages) `Dockerfile` with name. Moreover you should render this static files with a proxy, I advise you to use this docker image `nginx:1.17-alpine` as base.
+Now that you wrote the Dockerfile for the frontend app, you can build the image using [docker build](https://docs.docker.com/engine/reference/commandline/build/) from the root of this project. 
+Here's a list of usefull options:
 
-I advise you to named your different stage. Actually you can copy the content of a build in a previous stage into another like this `COPY --from=stage-build` only if you named a previous stage like this `FROM node:lts-slim AS stage-build`. Now you could copy the content of `/app/dist` into `/usr/share/nginx/html/`.
-
->I created for you a file named `.dockerignore` who allow, like gitignore, to omit or no, copy of file or directory into an image. You should notice tha we have use a white-list system, allow only what you need.
-> _TIPS: if we add `!/app/dist` in `.dockerignore` it' cause of a  multi-stage_
-
-Now you could build the image with [docker build](https://docs.docker.com/engine/reference/commandline/build/) from the root of this project. You can use this option:
-
-- Named or tagged the image
+- Name or tag the image
 - Specify a Dockerfile
 - Specify the path of the build
 
@@ -78,6 +78,8 @@ Now you could build the image with [docker build](https://docs.docker.com/engine
 docker build -t dockerclazz-frontend:v0.1 -f frontend/Dockerfile frontend
 ```
 </details>
+
+#### 🐳 1.3 Creating a container from our image and testing.
 
 Now you could run the image with [docker run](https://docs.docker.com/engine/reference/commandline/run/). You can use this option:
 
@@ -97,11 +99,29 @@ docker run -it -d -p 8080:80 --rm --name dockerize-vuejs dockerclazz-frontend
 
 Now visit http://localhost:8080 (if you run on a distant server `http://<YOUR_IP>:8080`)
 
-If you finished execute :
+If you finished the execution :
 ```bash
 docker ps -a
 docker stop <CONTAINER_NAME_OR_ID>
 ```
+
+Voila ! Congratulations, you just built your VueJS frontend app into a docker image ! You can now use it to spawn any number of your application instances.
+
+#### 🐳 1.4 Enhancing the Dockerfile
+
+One thing remains : your docker image is still pretty heavy for only a sample project, and the more dependencies you'll add, the more it will grow.
+
+Currently, have an image with all the copied files before. But the only thing your app needs to run is the result of the `$ npm run build` command. This static result is located in the directory named `dist` into `/app`.
+
+To keep the only important content `/app/dist` you should do a [multi stage](https://docs.docker.com/develop/develop-images/multistage-build/#name-your-build-stages) `Dockerfile`. Multi-stage will help us build the app in a temporary image and then copy the result of the build into a definitive image. To render static HTML/CSS and JS you should use a proxy, I advise you to use this docker image `nginx:1.17-alpine` as base.
+
+I recommend that you name your different stages.
+You can copy the content of a build in a previous stage into another like this `COPY --from=stage-build` only if you named a previous stage like this `FROM node:lts-slim AS stage-build`. Now you can copy the content of `/app/dist` into `/usr/share/nginx/html/`.
+
+>I created for you a file named .dockerignore whose job is similar to a .gitignore file, It can allow or ignore files during the build of the docker image. The best practises in a .dockerignore are the same as a .gitignore, so by default you should always ignore everything and then white-list the things you need.
+>__WARNING:__ when using Kaniko to build the images the .dockerignore behavior is slightly different than when using Docker. As a result white-listing /app/dist is mandatory when using Kaniko and a multi-stage image building.
+
+If you now build your image again, the image should be much more of a lighter weight.
 
 ### 🐍 2. Create Dockerfile for Django
 
