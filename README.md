@@ -12,11 +12,11 @@
 
 ## General presentation
 
-The goal of this project is to help you to follow my advises to write Dockerfile and introduce you to Docker best practises. You will follow a sequence of steps which will guide you throught the journey of building Dockerfiles. You will also need to refer to the official [Docker documentation](https://docs.docker.com/).
+The goal of this project is to dive my advises to write Dockerfile and introduce you to Docker best practises. You will follow a sequence of steps which will guide you throught the journey of building Dockerfiles. You will also need to refer to the official [Docker documentation](https://docs.docker.com/).
 
 ## Description of the project structure
 
-In this project you will find:
+In this project, you will find:
 * A frontend application VueJS in the directory `./frontend`.
 * A backend application Django in the directory `./backend`.
 * And this README.
@@ -25,7 +25,7 @@ I invite you to fork this project to work directly on it.
 
 ## Requierements to start this project
 
-First of all you will need to install [Docker 🐳](https://docs.docker.com/get-docker/) (If you don't want to install it on your laptop you could install it on a virtual machine or a Cloud Provider but remember you'll need this project on the machine hosting docker to build your docker images).
+First of all, you need to install [Docker 🐳](https://docs.docker.com/get-docker/) (If you don't want to install it locally on your computer, you can install it on virtual machine or a Cloud Provider, just keep in mind you will need this project to code).
 
 You also need to fork/clone this project to start working.
 
@@ -55,11 +55,11 @@ As the frontend app is a VueJS app, to build the image you need to :
 - Run `$ npm run build` to build the project as a static html/css/js app.
 >__Note:__ When using VueJS, this command is defined into `package.json` file as `vue-cli-service build`. As a result behind the scenes, this is the command that will be used to build the app. You can checkout the documentation about [npm-run](https://docs.npmjs.com/cli/run-script) to understand how of npm scripts works)
 
-To use a base image you should use annotation [FROM](https://docs.docker.com/engine/reference/builder/#from)
+To use a base image, you should use annotation [FROM](https://docs.docker.com/engine/reference/builder/#from)
 
-To create a workspace you should use annotation [WORKDIR](https://docs.docker.com/engine/reference/builder/#workdir)
+To create a workspace, you should use annotation [WORKDIR](https://docs.docker.com/engine/reference/builder/#workdir)
 
-To copy a file from the project into the image you should use annotation [ADD](https://docs.docker.com/engine/reference/builder/#add) or [COPY](https://docs.docker.com/engine/reference/builder/#copy)
+To copy a file from the project into the image, you should use annotation [ADD](https://docs.docker.com/engine/reference/builder/#add) or [COPY](https://docs.docker.com/engine/reference/builder/#copy)
 
 To run a command into docker image you should use annotation [RUN](https://docs.docker.com/engine/reference/builder/#run)
 
@@ -114,7 +114,7 @@ One thing remains : your docker image is still pretty heavy for only a sample pr
 
 Currently, have an image with all the copied files before. But the only thing your app needs to run is the result of the `$ npm run build` command. This static result is located in the directory named `dist` into `/app`.
 
-To keep the only important content `/app/dist` you should do a [multi stage](https://docs.docker.com/develop/develop-images/multistage-build/#name-your-build-stages) `Dockerfile`. Multi-stage will help us build the app in a temporary image and then copy the result of the build into a definitive image. To render static HTML/CSS and JS you should use a proxy, I advise you to use this docker image `nginx:1.17-alpine` as base.
+To keep only the important content `/app/dist`, do a [multi stage](https://docs.docker.com/develop/develop-images/multistage-build/#name-your-build-stages) `Dockerfile`. Multi-stage will help us build the app in a temporary image and then copy the result of the build into a definitive image. To render static HTML/CSS and JS you should use a proxy, I advise you to use this docker image `nginx:1.17-alpine` as base.
 
 I recommend that you name your different stages.
 You can copy the content of a build in a previous stage into another like this `COPY --from=stage-build` only if you named a previous stage like this `FROM node:lts-slim AS stage-build`. Now you can copy the content of `/app/dist` into `/usr/share/nginx/html/`.
