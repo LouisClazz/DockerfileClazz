@@ -1,7 +1,12 @@
 *
-__pycache__/
+__pycache__
+*.pyc
+*.pyo
+*.pyd
 
 !app/
-!backend
+!backend/
+
+backend/settings/local.py
 !manage.py
 !requirements.txt

@@ -1,2 +1,4 @@
 venv/
 env/
+app/local.py
+backend/backend/settings/local.py
