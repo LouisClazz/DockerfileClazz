@@ -52,8 +52,8 @@ As the frontend app is a VueJS app, to build the image you need to :
 - Run `$ npm ci` to install dependancies (Check the official documentation for [npm-ci](https://docs.npmjs.com/cli/ci.html))
 >__Note:__ We first copy the `package.json` and `package-lock.json` files into the image and download dependencies so docker keep these layers in its cache so we don't have to download it again everytime we build the image.
 - Copy the whole content of the frontend directory into the docker image.
-- Run `$ npm run build` to build the project as a static html/css/js app.
->__Note:__ When using VueJS, this command is defined into `package.json` file as `vue-cli-service build`. As a result behind the scenes, this is the command that will be used to build the app. You can checkout the documentation about [npm-run](https://docs.npmjs.com/cli/run-script) to understand how of npm scripts works)
+- Execute the command `$ npm run serve` to run a server.
+>__Note:__ When using VueJS, this command is defined into `package.json` file as `vue-cli-service serve`. As a result behind the scenes, this is the command that will be used to run the app. You can checkout the documentation about [npm-run](https://docs.npmjs.com/cli/run-script) to understand how of npm scripts works)
 
 To use a base image, you should use annotation [FROM](https://docs.docker.com/engine/reference/builder/#from)
 
@@ -62,6 +62,8 @@ To create a workspace, you should use annotation [WORKDIR](https://docs.docker.c
 To copy a file from the project into the image, you should use annotation [ADD](https://docs.docker.com/engine/reference/builder/#add) or [COPY](https://docs.docker.com/engine/reference/builder/#copy)
 
 To run a command into docker image you should use annotation [RUN](https://docs.docker.com/engine/reference/builder/#run)
+
+To execute a command on running docker step you should use annotation [CMD](https://docs.docker.com/engine/reference/builder/#cmd)
 
 #### 🐳 1.2 Building the docker image.
 
@@ -87,14 +89,14 @@ Here's a list of usefull options :
 - interactive
 - tty
 - detach
-- port (on 8080:80)
+- port (on 8080:8080)
 - Remove automatically if it's stoped
 - Name
 
 <details><summary><i>SPOILER ALERT</i>: Response to run</summary>
 
 ```bash
-docker run -it -d -p 8080:80 --rm --name dockerize-vuejs dockerclazz-frontend
+docker run -it -d -p 8080:8080 --rm --name dockerize-vuejs dockerclazz-frontend
 ```
 </details>
 
@@ -122,7 +124,7 @@ You can copy the content of a build in a previous stage into another like this `
 >I created for you a file named .dockerignore whose job is similar to a .gitignore file, It can allow or ignore files during the build of the docker image. The best practises in a .dockerignore are the same as a .gitignore, so by default you should always ignore everything and then white-list the things you need.
 >__WARNING:__ when using Kaniko to build the images the .dockerignore behavior is slightly different than when using Docker. As a result white-listing /app/dist is mandatory when using Kaniko and a multi-stage image building.
 
-If you now build your image again, the image should be much more of a lighter weight.
+If you now build your image again, the image should be much more of a lighter weight. The port use for this will be `80` cause of Nginx image.
 
 ### 🐍 2. Create Dockerfile for Django
 
