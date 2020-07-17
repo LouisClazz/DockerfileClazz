@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
-import os
+import os, sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -119,3 +119,21 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+class _pseudomodule(object):
+    def __init__(self, func):
+        self.__file__ = func
+
+def execfile(path):
+
+    with open(path, encoding='utf-8') as f:
+        code = compile(f.read(), path, 'exec')
+        exec(code, globals(), locals())#{'__file__': __file__}, {})
+
+LOCAL_SETTINGS = os.path.join(os.path.dirname(__file__), "local.py")
+if os.path.isfile(LOCAL_SETTINGS):
+    sys.modules["_backend_settings_local"] = _pseudomodule(LOCAL_SETTINGS)
+    execfile(LOCAL_SETTINGS)
+
+
+globals().update(locals())
